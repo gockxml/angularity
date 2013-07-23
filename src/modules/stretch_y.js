@@ -1,22 +1,24 @@
 angular.module('angularity.stretchY', []).directive('stretchY', function($parse, $window, $timeout){
 	return {
 		link:function(scope, element, attr){
+			var fn;
+			var resize = function(){
+				var c = element[0];
+				var p = c.offsetParent;
+				element.css('height', p.offsetHeight - c.offsetTop - parseInt(attr.stretchMargin || 0) + "px")
+				fn(scope);
+			}
+			scope.$on('$stretch_y_resize', resize)
 			attr.$observe('stretchY', function(value){
 				if (value){
-					var fn = $parse(value);
-					console.log('init stretching');
-					var resize = function(){
-						var c = element[0];
-						var p = c.offsetParent;
-						element.css('height', p.offsetHeight- c.offsetTop - parseInt(attr.stretchMargin || 0) + "px")
-						scope.$apply(function(){
-							fn(scope);
-						})
-					}
+					fn = $parse(value);
+					console.log('init stretching', attr.stretchMargin );
 					angular.element($window).bind("resize", resize);
 					//$window.onresize = 
 					$timeout(function(){
-						resize();
+						scope.$apply(function(){
+							resize();
+						})
 					})
 					scope.$on("$destroy", function(){
 						console.log("gc...");

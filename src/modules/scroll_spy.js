@@ -2,8 +2,9 @@ angular.module('angularity.scrollSpy', []).directive('scrollSpy', function(){
 	return {
 		restrict : "A",
 		controller: function($scope, $window, $attrs, $document, $element, $parse, $timeout){
-			$scope.spys = [];
-			$scope.indicators = [];
+			var spys = [];
+			var indicators = [];
+			var spy_target;
 			var controller = this;
 			var is_jump = false;
 			var jump_offset = parseInt($attrs.jumpOffset) || 0;
@@ -30,16 +31,16 @@ angular.module('angularity.scrollSpy', []).directive('scrollSpy', function(){
 			}
 			$element.controller().$scroll_spy = this;
 			this.indexOf = function(element){
-				return $scope.indicators.indexOf(element);
+				return indicators.indexOf(element);
 			}
 			this.get_spy = function(indicator, allow_id){
-				var i = angular.isNumber(indicator) ? indicator : $scope.indicators.indexOf(indicator);
-				var s = document.getElementById($scope.spys[i]);
-				return !s && allow_id ? $scope.spys[i] : s;
+				var i = angular.isNumber(indicator) ? indicator : indicators.indexOf(indicator);
+				var s = document.getElementById(spys[i]);
+				return !s && allow_id ? spys[i] : s;
 			}
 			this.add_spy = function(index, spy){
-				$scope.indicators.push(index);
-				$scope.spys.push(spy);
+				indicators.push(index);
+				spys.push(spy);
 			}
 			this.jump_to = function(element){
 				var s = controller.get_spy(element);
@@ -70,8 +71,8 @@ angular.module('angularity.scrollSpy', []).directive('scrollSpy', function(){
 
 			}
 			var notify = function(index, message, direction){
-				var indicator = $scope.indicators[index];
-				var spy = angular.element(document.getElementById($scope.spys[index]));
+				var indicator = indicators[index];
+				var spy = angular.element(document.getElementById(spys[index]));
 				indicator && indicator.triggerHandler(message, [indicator, spy,  direction])
 				$element.triggerHandler(message, [indicator, spy, direction])
 
@@ -87,7 +88,7 @@ angular.module('angularity.scrollSpy', []).directive('scrollSpy', function(){
 				}
 				// ie : documentElement for ie
 				var top = (document.body.scrollTop || document.documentElement.scrollTop) - offset
-				var views = $scope.spys.map(function(item){
+				var views = spys.map(function(item){
 					return document.getElementById(item);
 				})
 				var d = views.map(function(item, i){
@@ -107,26 +108,26 @@ angular.module('angularity.scrollSpy', []).directive('scrollSpy', function(){
 						//target = second_target;
 					//}
 					//console.log('target/...', target)
-					if (target && target[0] + offset < - 100 && second_target && second_target[2] == $scope.spy_target) {
+					if (target && target[0] + offset < - 100 && second_target && second_target[2] == spy_target) {
 						//console.log('maintain the target', target, second_target, $scope.spy_target);
-						target = $scope.spy_target
+						target = spy_target
 					}
 					else {
 						target = target &&  target[2];
 						if (target != null){
-							target = force_fluent(target, $scope.spy_target)
+							target = force_fluent(target, spy_target)
 						}
 					}
 				}
-				var direction = - $scope.spy_target + target;	
+				var direction = - spy_target + target;	
 				direction = direction > 0 ? 1 : -1;
 				if (index) direction = 0;
 				//console.log('target change:' , target, $scope.spy_target)
-				if ($scope.spy_target != target){
-					notify($scope.spy_target || 0, "$leavespy", direction);
-					$scope.spy_target = target;
+				if (spy_target != target){
+					notify(spy_target || 0, "$leavespy", direction);
+					spy_target = target;
 				}
-				$scope.spy_target == null || notify($scope.spy_target, "$onspy", direction);
+				spy_target == null || notify(spy_target, "$onspy", direction);
 			}
 			angular.element($window).safe_bind('scroll', onscroll, $scope);
 
