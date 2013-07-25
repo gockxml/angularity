@@ -19,19 +19,20 @@ angular.module('angularity.scrollbar', []).directive('scrollbar', function($pars
 			})
 		}
 
-		attr.watchon && scope.$watch(attr.watchon, function(newValue, oldValue){
-
+		attr.watchon && scope.$watch(attr.watchon + '.length', function(newValue, oldValue){
 			$timeout(function(){
-				if (attr.$attr['autoUpdatePosition'] && oldValue && oldValue.length){
+				if (attr.$attr['autoUpdatePosition'] && oldValue){
                     var pos = attr.autoUpdatePosition || 'bottom'
-					if (oldValue.length  < newValue.length){
+                    scope.$$scrollbar.update_scrollbar(pos);
+                    /*
+					if (oldValue  < newValue){
 						scope.$$scrollbar.update_scrollbar(pos);
 					}
 					else{
-						if (oldValue.length > newValue.length){
-							scope.$$scrollbar.update_scrollbar('top');
+						if (oldValue > newValue){
 						}
-					}
+                    }
+                    */
 				}
 				scope.$$scrollbar.update_scrollbar();
 			})
@@ -162,7 +163,7 @@ angular.module('angularity.scrollbar', []).directive('scrollbar', function($pars
         },
         replace: true,
         require:'^scrollbar',
-        template:'<span class="scroll-indicator-wrapper"><span class="scroll-indicator"><span class="current">{{ current }}</span>/<span class="total">{{ total }}</span></span></span>',
+        template:'<span class="scroll-indicator-wrapper"><span class="scroll-indicator"><span class="current">[[ current ]]</span>/<span class="total">[[ total ]]</span></span></span>',
         link: function(scope, element, attr, ctrl){
             element.remove();
             var unbind = scope.$on('$scroll_init', function(){
