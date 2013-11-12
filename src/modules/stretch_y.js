@@ -5,7 +5,8 @@ angular.module('angularity.stretchY', []).directive('stretchY', function($parse,
 			var resize = function(){
 				var c = element[0];
 				var p = c.offsetParent;
-				element.css('height', p.offsetHeight - c.offsetTop - parseInt(attr.stretchMargin || 0) + "px")
+				var h = p.offsetHeight - c.offsetTop - parseInt(attr.stretchMargin || 0)
+				h && element.css('height', h + "px")
 				fn(scope);
 			}
 			scope.$on('$stretch_y_resize', resize)

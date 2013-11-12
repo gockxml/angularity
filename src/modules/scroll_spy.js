@@ -97,7 +97,7 @@ angular.module('angularity.scrollSpy', []).directive('scrollSpy', function(){
 						return  - a[0] +  b[0]
 					});
 				var target;
-				if (index){
+				if (index != null){
 					target = index
 				}
 				else{
